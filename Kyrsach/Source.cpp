@@ -6,4 +6,4 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(900, 540), "kyrsach");
 	Game(window);
-};
+}

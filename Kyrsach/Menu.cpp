@@ -10,7 +10,7 @@ void Game(sf::RenderWindow & window)
 	std::vector<Object> objects;
 	objects = lvl.GetAllObjects();
 
-	Player p(50, 700);
+	Player p(150, 500);
 	p.setObjects(objects);
 
 

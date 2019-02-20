@@ -1,6 +1,6 @@
 #include "Player.h"
 
-#define RECT
+//#define RECT
 
 Player::Player(double x, double y) :Entity(x, y)
 {
@@ -39,7 +39,7 @@ void Player::Control()
 
 
 	}
-	else if (isAlive)
+	else if (isAlive&&OnGround)
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 		{
@@ -80,7 +80,7 @@ void Player::Control()
 
 			}
 		}
-		else
+		else 
 		{
 			if (direction == Direction::Left || direction == Direction::Jump_Left)
 			{
@@ -96,7 +96,7 @@ void Player::Control()
 			}
 		}
 	}
-	else
+	else if (!isAlive)
 	{
 		if (direction == Direction::Left || direction == Direction::Jump_Left)
 		{
@@ -115,43 +115,48 @@ void Player::Control()
 
 void Player::Update(double time)
 {
-	animation.Animate(3.5*time);
-	if (!OnGround)
+	animation.Animate(4*time);
+	
+	switch (this->direction)
 	{
-		y += Speed * time;
-		for (int i=0 ;i< Objects.size();i++)
+	case  Direction::Stay_Left:
+		if (!this->OnGround)
 		{
-
-			if (rect.getGlobalBounds().intersects(Objects[i].rect))
-			{
-				OnGround = 1;
-				std::cout << "colision\n";
-			}
+			y += FallSpeed * time;
 		}
-	}
-	else
-	{
-		switch (direction)
+		break;
+	case  Direction::Stay_Right:
+		if (!this->OnGround)
 		{
-		case Entity::Direction::Left:
-			x -= Speed * time;
+			y += FallSpeed * time;
 
-			break;
-		case Entity::Direction::Right:
+		}
+		
+		break;
+	case  Direction::Left:
+		if (this->OnGround)
+		{
+			x -= Speed * time;
+		}
+		else
+		{
+			y += FallSpeed * time;
+		}
+		break;
+	case  Direction::Right:
+		if (this->OnGround)
+		{
 			x += Speed * time;
 
-			break;
-		case Entity::Direction::Jump:
-
-			break;
-		case Entity::Direction::Jump_Left:
-			break;
-		case Entity::Direction::Jump_Right:
-			break;
 		}
-
-
+		else
+		{
+			y += FallSpeed * time;
+		}
+		break;
 	}
+
+	CheckCollision();
 	animation.setPosition(x - 30, y);
 	rect.setPosition(sf::Vector2f(x, y));
 }
@@ -168,3 +173,25 @@ void Player::Draw(sf::RenderWindow & window)
 
 	animation.draw(window);
 }
+
+void Player::CheckCollision()
+{
+	bool flag = 0;
+	for (int i=0; i < Objects.size(); i++)
+	{
+		if (rect.getGlobalBounds().intersects(Objects[i].rect))
+		{
+			if (Objects[i].name == "solid")
+			{
+				flag = 1;
+				OnGround = 1;
+				std::cout << "here\n";
+			}
+			
+		}
+	
+	}
+	if (!flag)
+		OnGround = 0;
+}
+

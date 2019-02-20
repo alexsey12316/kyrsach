@@ -30,5 +30,6 @@ protected:
 	std::vector<Object> Objects;
 	double Speed;
 	bool OnGround;
+	double FallSpeed;
 };
 

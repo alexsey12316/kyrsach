@@ -11,6 +11,7 @@ public:
 	void Draw(sf::RenderWindow &window);
 
 private:
-
+	void CheckCollision();
+	
 };
 
