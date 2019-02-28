@@ -9,21 +9,12 @@
 #include <vector>
 #include <map>
 #include <SFML/Graphics.hpp>
+#include"Box2D/Box2D.h"
 
 using namespace std;
 using namespace sf;
 
-struct Object
-{
-	int GetPropertyInt(string name);
-	float GetPropertyFloat(string name);
-	string GetPropertyString(string name);
-	string name;
-	string type;
-	Rect<float> rect;
-	map<string, string> properties;
-	Sprite sprite;
-};
+
 
 struct Layer
 {
@@ -35,24 +26,32 @@ class Level
 {
 public:
 	bool LoadFromFile(string filename);
-	Object GetObject(string name);
-	vector<Object> GetObjects(string name);
+	void DrawTiles(RenderWindow &window);
 	void Draw(RenderWindow &window);
-	void DrawVisible(RenderWindow &window,View &camera);
+	void DrawTiles(RenderWindow &window,View &camera);
 	FloatRect GetViewRegion(View &camera);
 	Vector2i GetTileSize();
-	std::vector<Object> GetAllObjects();
+	b2World * GetWorld();
+	Level();
+	~Level();
+	
+
 	
 	
 
 
 private:
+	const float SCALE = 30.0f;
+	const float DEG = 57.29577f;
 	int width, height, tileWidth, tileHeight;
-	int firstTileID;
 	Rect<float> drawingBounds;
-	Texture tilesetImage;
-	vector<Object> objects;
 	vector<Layer> layers;
+	b2World *world;
+	RenderTexture MapTexture;
+	Sprite MapSprite;
+	vector<Texture> tilesetImage;
+
+	vector<int> firstTileID;
 };
 
 #endif

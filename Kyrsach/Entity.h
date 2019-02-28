@@ -16,7 +16,6 @@ public:
 	virtual void Draw(sf::RenderWindow &window);
 	virtual void setHealth(double health);
 	virtual void setMaxHealth(double MaxHealth);
-	virtual void setObjects(std::vector<Object> &vec);
 protected:
 	double x, y;
 	double width, height;
@@ -27,9 +26,8 @@ protected:
 	sf::RectangleShape rect;
 	Animation animation;
 	Direction direction;
-	std::vector<Object> Objects;
 	double Speed;
 	bool OnGround;
-	double FallSpeed;
+	double JumpTime;
 };
 

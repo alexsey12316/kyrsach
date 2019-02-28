@@ -126,5 +126,10 @@ bool Animation::setAnimation(int currentRow, AnimationType type)
 
 }
 
+int Animation::GetCurrentRow()
+{
+	return currentRow;
+}
+
 
 

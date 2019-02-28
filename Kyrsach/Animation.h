@@ -21,6 +21,7 @@ public:
 	void setPosition(double x, double y);
 	void Animate(double time);
 	bool setAnimation(int currentRow, AnimationType type);
+	int GetCurrentRow();
 
 private:
 	double progress;

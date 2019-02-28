@@ -9,7 +9,7 @@ Entity::Entity(double x,double y)
 	isAlive = 1;
 	isHurt = 0;
 	animation.setPosition(x, y);
-	FallSpeed = 150;
+	JumpTime = 1;
 }
 
 Entity::Entity(double x, double y, double width, double height):Entity(x,y)
@@ -36,11 +36,6 @@ void Entity::setMaxHealth(double MaxHealth)
 	if (MaxHealth < health)
 		health = MaxHealth;
 
-}
-
-void Entity::setObjects(std::vector<Object>& vec)
-{
-	this->Objects = vec;
 }
 
 

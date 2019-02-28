@@ -2,21 +2,25 @@
 #include "Level.h"
 #include "Player.h"
 
+
+#define WIDTH   900
+#define HEIGHT  540
+
 void Game(sf::RenderWindow & window)
 {
 	window.setFramerateLimit(60);
 	Level lvl;
 	lvl.LoadFromFile("maps/test.tmx");
-	std::vector<Object> objects;
-	objects = lvl.GetAllObjects();
 
 	Player p(150, 500);
-	p.setObjects(objects);
 
 
 
 	sf::View camera;
-	camera.setSize(900, 540);
+	camera.setSize(WIDTH, HEIGHT);
+
+
+
 	double time;
 	sf::Clock clock;
 	while (window.isOpen())
@@ -31,8 +35,7 @@ void Game(sf::RenderWindow & window)
 		}
 		p.Control();
 		p.Update(time);
-		camera.setCenter(p.getPosition());
-
+		p.SetCamera(camera);
 
 		window.setView(camera);
 		window.clear();

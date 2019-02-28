@@ -1,27 +1,16 @@
 #include "level.h"
 #include <iostream>
 #include "TinyXML/tinyxml.h"
-
+#pragma warning(disable : 4996)
 using namespace std;
 using namespace sf;
 
-int Object::GetPropertyInt(string name)
-{
-	return atoi(properties[name].c_str());
-}
 
-float Object::GetPropertyFloat(string name)
-{
-	return (float)strtod(properties[name].c_str(), NULL);
-}
-
-string Object::GetPropertyString(string name)
-{
-	return properties[name];
-}
 
 bool Level::LoadFromFile(string filename)
 {
+	string path;
+	path = filename.substr(0,filename.find_last_of('/')+1);
 	TiXmlDocument levelFile(filename.c_str());
 
 	if (!levelFile.LoadFile())
@@ -41,43 +30,54 @@ bool Level::LoadFromFile(string filename)
 	tileHeight = atoi(map->Attribute("tileheight"));
 
 	TiXmlElement *tilesetElement;
+
+	vector<vector<Rect<int>>> subRects;
+
+
+
 	tilesetElement = map->FirstChildElement("tileset");
-	firstTileID = atoi(tilesetElement->Attribute("firstgid"));
 
-	TiXmlElement *image;
-	image = tilesetElement->FirstChildElement("image");
-	string imagepath = image->Attribute("source");
-
-
-	Image img;
-
-	if (!img.loadFromFile("maps/"+imagepath))                       //добавить путь
+	while (tilesetElement != NULL)
 	{
-		cout << "Failed to load tile sheet." << endl;
-		return false;
-	}
+		firstTileID.push_back(atoi(tilesetElement->Attribute("firstgid")));
 
-	img.createMaskFromColor(Color(109, 159, 185));
-	tilesetImage.loadFromImage(img);
-	tilesetImage.setSmooth(false);
+		TiXmlElement *image = tilesetElement->FirstChildElement("image");
+		string imagepath = image->Attribute("source");
 
-	int columns = tilesetImage.getSize().x / tileWidth;
-	int rows = tilesetImage.getSize().y / tileHeight;
 
-	vector<Rect<int>> subRects;
-
-	for (int y = 0; y < rows; y++)
-		for (int x = 0; x < columns; x++)
+		Image img;
+		if (!img.loadFromFile(path + imagepath))                       //добавить путь
 		{
-			Rect<int> rect;
-
-			rect.top = y * tileHeight;
-			rect.height = tileHeight;
-			rect.left = x * tileWidth;
-			rect.width = tileWidth;
-
-			subRects.push_back(rect);
+			cout << "Failed to load tile sheet." << endl;
+			return false;
 		}
+
+		img.createMaskFromColor(Color(109, 159, 185));
+		Texture tiles;
+		tiles.loadFromImage(img);
+		//tiles.setSmooth(false);
+		tilesetImage.push_back(tiles);
+
+		int columns = tiles.getSize().x / tileWidth;
+		int rows = tiles.getSize().y / tileHeight;
+
+		vector<Rect<int>> SubSubRects;
+
+		for (int y = 0; y < rows; y++)
+			for (int x = 0; x < columns; x++)
+			{
+				Rect<int> rect;
+
+				rect.top = y * tileHeight;
+				rect.height = tileHeight;
+				rect.left = x * tileWidth;
+				rect.width = tileWidth;
+
+				SubSubRects.push_back(rect);
+			}
+		tilesetElement = tilesetElement->NextSiblingElement("tileset");
+		subRects.push_back(SubSubRects);
+	}
 
 	TiXmlElement *layerElement;
 	layerElement = map->FirstChildElement("layer");
@@ -117,19 +117,64 @@ bool Level::LoadFromFile(string filename)
 
 		while (tileElement)
 		{
-			int tileGID = atoi(tileElement->Attribute("gid"));
-			int subRectToUse = tileGID - firstTileID;
-
-			if (subRectToUse >= 0)
+			if (tileElement->Attribute("gid") != NULL)
 			{
-				Sprite sprite;
-				sprite.setTexture(tilesetImage);
-				sprite.setTextureRect(subRects[subRectToUse]);
-				sprite.setPosition(x * (float)tileWidth, y * (float)tileHeight);
-				sprite.setColor(Color(255, 255, 255, layer.opacity));
+				int tileGID = atoi(tileElement->Attribute("gid"));
+				if (firstTileID.size() == 1)
+				{
+					int subRectToUse = tileGID - firstTileID[0];
 
-				layer.tiles.push_back(sprite);
+					if (subRectToUse >= 0)
+					{
+						Sprite sprite;
+						sprite.setTexture(tilesetImage[0]);
+						sprite.setTextureRect(subRects[0][subRectToUse]);
+						sprite.setPosition(x * (float)tileWidth, y * (float)tileHeight);
+						sprite.setColor(Color(255, 255, 255, layer.opacity));
+
+						layer.tiles.push_back(sprite);
+					}
+				}
+				else
+				{
+					for (size_t i = 0; i < firstTileID.size(); i++)
+					{
+						if ((i == firstTileID.size() - 1))
+						{
+							int subRectToUse = tileGID - firstTileID[i];
+
+							if (subRectToUse >= 0)
+							{
+								Sprite sprite;
+								sprite.setTexture(tilesetImage[i]);
+								sprite.setTextureRect(subRects[i][subRectToUse]);
+								sprite.setPosition(x * (float)tileWidth, y * (float)tileHeight);
+								sprite.setColor(Color(255, 255, 255, layer.opacity));
+
+								layer.tiles.push_back(sprite);
+							}
+						}
+						else if ((tileGID >= firstTileID[i] && tileGID < firstTileID[i + 1]))
+						{
+							int subRectToUse = tileGID - firstTileID[i];
+
+							if (subRectToUse >= 0)
+							{
+								Sprite sprite;
+								sprite.setTexture(tilesetImage[i]);
+								sprite.setTextureRect(subRects[i][subRectToUse]);
+								sprite.setPosition(x * (float)tileWidth, y * (float)tileHeight);
+								sprite.setColor(Color(255, 255, 255, layer.opacity));
+
+								layer.tiles.push_back(sprite);
+							}
+							break;
+						}
+					}
+				}
 			}
+
+
 
 			tileElement = tileElement->NextSiblingElement("tile");
 
@@ -148,6 +193,15 @@ bool Level::LoadFromFile(string filename)
 		layerElement = layerElement->NextSiblingElement("layer");
 	}
 
+	
+	MapTexture.create(width*tileWidth, height*tileHeight);
+
+	for (unsigned int layer = 0; layer < layers.size(); layer++)
+		for (unsigned int tile = 0; tile < layers[layer].tiles.size(); tile++)
+			MapTexture.draw(layers[layer].tiles[tile]);
+	MapTexture.display();
+	MapSprite.setTexture(MapTexture.getTexture());
+
 	TiXmlElement *objectGroupElement;
 
 	if (map->FirstChildElement("objectgroup") != NULL)
@@ -160,73 +214,72 @@ bool Level::LoadFromFile(string filename)
 
 			while (objectElement)
 			{
-				string objectType;
-				if (objectElement->Attribute("type") != NULL)
-				{
-					objectType = objectElement->Attribute("type");
-				}
-				string objectName;
-				if (objectElement->Attribute("name") != NULL)
-				{
-					objectName = objectElement->Attribute("name");
-				}
-				int x = atoi(objectElement->Attribute("x"));
-				int y = atoi(objectElement->Attribute("y"));
 
-				int width, height;
+				float x = atof(objectElement->Attribute("x"));
+				float y = atof(objectElement->Attribute("y"));
 
-				Sprite sprite;
-				sprite.setTexture(tilesetImage);
-				sprite.setTextureRect(Rect<int>(0, 0, 0, 0));
-				sprite.setPosition((float)x, (float)y);
+				float width, height;
+				b2BodyDef definition;
+
 
 				if (objectElement->Attribute("width") != NULL)
 				{
-					width = atoi(objectElement->Attribute("width"));
-					height = atoi(objectElement->Attribute("height"));
+					width = atof(objectElement->Attribute("width"));
+					height = atof(objectElement->Attribute("height"));
+					b2PolygonShape shape;
+					definition.position.Set((x + width / 2) / SCALE, (y + height / 2) / SCALE);
+					shape.SetAsBox(width / 2 / SCALE, height / 2 / SCALE);
+					b2Body *body = world->CreateBody(&definition);
+					body->CreateFixture(&shape, 1);
+
 				}
-				else
+				else if (objectElement->FirstChildElement("polygon") != NULL)
 				{
-					width = 32;
-					height = 32;
-					/*width = subRects[atoi(objectElement->Attribute("gid")) - firstTileID].width;
-					height = subRects[atoi(objectElement->Attribute("gid")) - firstTileID].height;
-					sprite.setTextureRect(subRects[atoi(objectElement->Attribute("gid")) - firstTileID]);*/
-				}
+					TiXmlElement *Polygon = objectElement->FirstChildElement("polygon");
+					const char *str = Polygon->Attribute("points");
+					char *str2 = new char[255];
+					strcpy(str2, str);
+					int counter = 0;
+					str2 = strtok(str2, " ");
 
-				Object object;
-				object.name = objectName;
-				object.type = objectType;
-				object.sprite = sprite;
-
-				Rect <float> objectRect;
-				objectRect.top = y;
-				objectRect.left = x;
-				objectRect.height = height;
-				objectRect.width = width;
-				object.rect = objectRect;
-
-				TiXmlElement *properties;
-				properties = objectElement->FirstChildElement("properties");
-				if (properties != NULL)
-				{
-					TiXmlElement *prop;
-					prop = properties->FirstChildElement("property");
-					if (prop != NULL)
+					while (str2 != NULL)
 					{
-						while (prop)
-						{
-							string propertyName = prop->Attribute("name");
-							string propertyValue = prop->Attribute("value");
-
-							object.properties[propertyName] = propertyValue;
-
-							prop = prop->NextSiblingElement("property");
-						}
+						str2 = strtok(NULL, " ");
+						counter++;
 					}
-				}
+					delete[] str2;
+					str2 = new char[255];
 
-				objects.push_back(object);
+					strcpy(str2, str);
+					b2Vec2 *points = new b2Vec2[counter];
+					for (int i = 0; i < counter; i++)
+					{
+						points[i].x = x;
+						points[i].y = y;
+					}
+					int i = 0;
+					str2 = strtok(str2, " ,");
+					while (str2 != NULL)
+					{
+						points[i].x += atoi(str2);
+						str2 = strtok(NULL, " ,");
+						points[i].y += atoi(str2);
+						str2 = strtok(NULL, " ,");
+						i++;
+					}
+					delete[] str2;
+					for (int i = 0; i < counter; i++)
+					{
+						points[i].x /= SCALE;
+						points[i].y /= SCALE;
+					}
+					b2PolygonShape shape;
+					shape.Set(points, counter);
+					b2Body *body = world->CreateBody(&definition);
+					body->CreateFixture(&shape, 1);
+
+					delete[] points;
+				}
 
 				objectElement = objectElement->NextSiblingElement("object");
 			}
@@ -238,30 +291,10 @@ bool Level::LoadFromFile(string filename)
 		cout << "No object layers found..." << endl;
 	}
 
+
+
 	return true;
 }
-
-Object Level::GetObject(string name)
-{
-	for (unsigned int i = 0; i < objects.size(); i++)
-		if (objects[i].name == name)
-			return objects[i];
-}
-
-vector<Object> Level::GetObjects(string name)
-{
-	vector<Object> vec;
-	for (unsigned int i = 0; i < objects.size(); i++)
-		if (objects[i].name == name)
-			vec.push_back(objects[i]);
-
-	return vec;
-}
-std::vector<Object> Level::GetAllObjects()
-{
-	return objects;
-};
-
 
 
 Vector2i Level::GetTileSize()
@@ -269,39 +302,82 @@ Vector2i Level::GetTileSize()
 	return Vector2i(tileWidth, tileHeight);
 }
 
-void Level::Draw(RenderWindow &window)
+b2World * Level::GetWorld()
+{
+	return this->world;
+}
+
+Level::Level()
+{
+
+	world = new b2World(b2Vec2(0, 9.8));
+}
+
+Level::~Level()
+{
+	delete world;
+}
+
+void Level::DrawTiles(RenderWindow &window)
 {
 	for (unsigned int layer = 0; layer < layers.size(); layer++)
 		for (unsigned int tile = 0; tile < layers[layer].tiles.size(); tile++)
 			window.draw(layers[layer].tiles[tile]);
 }
 
-void Level::DrawVisible(RenderWindow & window, View & camera)
+void Level::Draw(RenderWindow & window)
+{
+	window.draw(MapSprite);
+}
+
+
+#define DRAW
+
+void Level::DrawTiles(RenderWindow & window, View & camera)
 {
 
-	/*for (unsigned int layer = 0; layer < layers.size(); layer++)
-	{
-		for (int i = 0; i < 33; i++)
+#ifdef DRAW
+
+	/*Vector2f Center = camera.getCenter();
+	Vector2f Size = camera.getSize();
+	Size.x = 1600;
+	Size.y = 1200;
+
+
+	int x = (Center.x - Size.x / 2) / tileWidth;
+	if (x < 0)
+		x = 0;
+	int y = (Center.y - Size.y / 2) / tileHeight;
+	if (y < 0)
+		y = 0;
+	int rows = y + height;
+	for (unsigned int layer = 0; layer < layers.size(); layer++)
+		for (y; y < rows; y++)
 		{
-			int tile = ((camera.getCenter().x - 1088) / 32)+(((camera.getCenter().y - 334) / 32) * 400) + (i * 400);
-			int tileMAX = tile + 34;
-			for (; tile < tileMAX; tile++)
-			{
+			int last = layers[layer].tiles.size();
+			for (unsigned int tile = x + y * width; tile < width + x + y * width; tile++)
+				if(tile<last)
 				window.draw(layers[layer].tiles[tile]);
-			}
-		}
+		}*/
 
-	}
-*/
+	window.draw(MapSprite);
 
 
+#else
 
+	Vector2f Center = camera.getCenter();
+	Vector2f Size = camera.getSize();
+
+	Rect<int> cameraArea = Rect<int>(Center.x - Size.x / 2, Center.y - Size.y / 2, Size.x, Size.y);
 
 	for (unsigned int layer = 0; layer < layers.size(); layer++)
-		for (unsigned int tile = 36000; tile < layers[layer].tiles.size(); tile++) {
-			if (GetViewRegion(camera).intersects(layers[layer].tiles[tile].getGlobalBounds()))
+		for (unsigned int tile = 0; tile < layers[layer].tiles.size(); tile++)
+			if (layers[layer].tiles[tile].getTextureRect().intersects(cameraArea))
 				window.draw(layers[layer].tiles[tile]);
-		}
+
+
+#endif // DRAW
+
 }
 
 FloatRect Level::GetViewRegion(View & camera)
