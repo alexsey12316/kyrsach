@@ -14,7 +14,8 @@
 using namespace std;
 using namespace sf;
 
-
+const float SCALE = 30.0f;
+const float DEG = 57.29577f;
 
 struct Layer
 {
@@ -41,8 +42,7 @@ public:
 
 
 private:
-	const float SCALE = 30.0f;
-	const float DEG = 57.29577f;
+	
 	int width, height, tileWidth, tileHeight;
 	Rect<float> drawingBounds;
 	vector<Layer> layers;

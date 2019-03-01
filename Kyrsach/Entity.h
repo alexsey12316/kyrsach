@@ -3,6 +3,7 @@
 #include<vector>
 #include"Animation.h"
 #include"Level.h"
+
 class Entity
 {
 public:
@@ -16,6 +17,7 @@ public:
 	virtual void Draw(sf::RenderWindow &window);
 	virtual void setHealth(double health);
 	virtual void setMaxHealth(double MaxHealth);
+	
 protected:
 	double x, y;
 	double width, height;
@@ -28,6 +30,10 @@ protected:
 	Direction direction;
 	double Speed;
 	bool OnGround;
+	bool EnableJump;
 	double JumpTime;
+	double currentJumpTime;
+	b2Body *body;
+	b2World *world;
 };
 

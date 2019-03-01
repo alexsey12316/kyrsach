@@ -119,9 +119,9 @@ bool Animation::setAnimation(int currentRow, AnimationType type)
 	this->animationType = type;
 
 	if (currentFrame == columns-1)
-		return 0;
-	else
 		return 1;
+	else
+		return 0;
 
 
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="60" height="33" tilewidth="32" tileheight="32" infinite="0" nextlayerid="20" nextobjectid="35">
+<map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="60" height="33" tilewidth="32" tileheight="32" infinite="0" nextlayerid="22" nextobjectid="53">
  <tileset firstgid="1" name="background" tilewidth="32" tileheight="32" tilecount="1980" columns="60">
   <image source="game_background_2.png" width="1920" height="1080"/>
  </tileset>
@@ -1987,24 +1987,21 @@
    <tile gid="1980"/>
   </data>
  </layer>
- <objectgroup id="19" name="Слой объектов 1">
-  <object id="3" name="solid" x="-1" y="981" width="1919" height="37"/>
-  <object id="20" name="solid" x="1" y="968" width="369" height="19"/>
-  <object id="21" name="solid" x="1" y="961" width="342" height="10"/>
-  <object id="22" name="solid" x="82" y="951" width="233" height="15"/>
-  <object id="23" name="solid" x="90" y="944" width="198" height="7"/>
-  <object id="24" name="solid" x="85" y="939" width="178" height="8"/>
-  <object id="25" name="solid" x="223" y="913">
-   <polygon points="0,0 32,23 -34,24"/>
+ <objectgroup id="21" name="Слой объектов 1">
+  <object id="36" name="solid" x="0" y="957">
+   <polygon points="0,0 22,-7 40,-30 73,-51 113,-62 157,-63 154,49 0,42"/>
   </object>
-  <object id="29" name="solid" x="102" y="905" width="113" height="31"/>
-  <object id="31" name="solid" x="89" y="897" width="113" height="6"/>
-  <object id="32" name="solid" x="104" y="887" width="75" height="9"/>
-  <object id="33" name="solid" x="109" y="893">
-   <polygon points="0,0 -67,26 -39,69"/>
+  <object id="47" name="solid" x="155" y="988" width="512" height="42"/>
+  <object id="48" name="solid" x="446" y="944">
+   <polygon points="51,31 88,20 137,17 207,18 255,17 253,48 154,49 -3,48"/>
   </object>
-  <object id="34" name="solid" x="43" y="918">
-   <polygon points="0,0 -43,32 -3,45"/>
+  <object id="49" name="solid" x="132" y="935">
+   <polygon points="115,5 198,34 261,57 115,55"/>
   </object>
+  <object id="50" name="solid" x="113" y="883">
+   <polygon points="44,13 87,26 108,33 122,46 134,58 130,102 41,106"/>
+  </object>
+  <object id="51" name="solid" x="1197" y="980" width="512" height="42"/>
+  <object id="52" name="solid" x="698" y="965" width="512" height="42"/>
  </objectgroup>
 </map>

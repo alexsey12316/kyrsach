@@ -9,7 +9,6 @@ Entity::Entity(double x,double y)
 	isAlive = 1;
 	isHurt = 0;
 	animation.setPosition(x, y);
-	JumpTime = 1;
 }
 
 Entity::Entity(double x, double y, double width, double height):Entity(x,y)
@@ -19,6 +18,8 @@ Entity::Entity(double x, double y, double width, double height):Entity(x,y)
 	rect.setSize(sf::Vector2f(width, height));
 
 }
+
+
 
 void Entity::Draw(sf::RenderWindow & window)
 {

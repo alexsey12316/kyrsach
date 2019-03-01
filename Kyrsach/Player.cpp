@@ -2,85 +2,83 @@
 
 #define RECT
 
-Player::Player(double x, double y) :Entity(x, y)
+Player::Player(b2World *world, double x, double y) :Entity(x, y)
 {
+	height = 100;
+	width = 60;
+
+	b2BodyDef definition;
+	definition.type = b2BodyType::b2_dynamicBody;
+	definition.position.Set((x + width / 2) / SCALE, (height / 2 + y) / SCALE);
+	b2PolygonShape shape;
+	shape.SetAsBox(width / 2 / SCALE, height / 2 / SCALE);
+	b2FixtureDef fixture;
+	fixture.friction = 0;
+	fixture.shape = &shape;
+	fixture.density = 1;
+	body = world->CreateBody(&definition);
+	body->CreateFixture(&fixture);
+
 	health = 100;
 	MaxHealth = 100;
-	Speed = 100;
-	animation.setFrameSize(160, 160);
+	animation.setFrameSize(height, height);
 	animation.setImage("character/player.png");
 	animation.setSize(10, 6);
-	animation.setPosition(x - 70, y - height);
+	animation.setPosition(x - 20, height);
 	OnGround = 0;
 	direction = Direction::Stay_Right;
-	height = 160;
-	width = 100;
-
+	
 	rect.setSize(sf::Vector2f(width, height));
 	rect.setPosition(sf::Vector2f(x, y));
-	rect.setOrigin(width / 2, height);
 	rect.setFillColor(sf::Color::Green);
+	Speed = 4;
+	JumpTime = currentJumpTime = 0.7;
+	EnableJump = 0;
+
 }
 
 void Player::Control()
 {
-	if (isHurt)
+	if (isHurt&&isAlive)
 	{
 
-		if (direction == Direction::Left)
-		{
-			direction = Direction::Stay_Left;
-			isHurt = animation.setAnimation(7, Animation::AnimationType::once);
-
-		}
-		else if (direction == Direction::Right)
-		{
-			direction = Direction::Stay_Right;
-			isHurt = animation.setAnimation(6, Animation::AnimationType::once);
-
-
-		}
+	
 
 
 	}
 	else if (isAlive&&OnGround)
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::W) && EnableJump)
 		{
 			direction = Direction::Jump_Left;
-			animation.setAnimation(5, Animation::AnimationType::once);
 
 		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && sf::Keyboard::isKeyPressed(sf::Keyboard::W) && EnableJump)
 		{
 			direction = Direction::Jump_Right;
-			animation.setAnimation(4, Animation::AnimationType::once);
 
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 		{
 			direction = Direction::Left;
-			animation.setAnimation(3, Animation::AnimationType::loop);
 
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 		{
 			direction = Direction::Right;
-			animation.setAnimation(2, Animation::AnimationType::loop);
 
 		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && EnableJump)
 		{
 			if (direction == Direction::Left || direction == Direction::Stay_Left)
 			{
 				direction = Direction::Jump;
-				animation.setAnimation(5, Animation::AnimationType::once);
 
 			}
 			else if (direction == Direction::Right || direction == Direction::Stay_Right)
 			{
 				direction = Direction::Jump;
-				animation.setAnimation(4, Animation::AnimationType::once);
 
 			}
 		}
@@ -89,13 +87,11 @@ void Player::Control()
 			if (direction == Direction::Left || direction == Direction::Jump_Left || (direction == Direction::Jump&&animation.GetCurrentRow() % 2 != 0))
 			{
 				direction = Direction::Stay_Left;
-				animation.setAnimation(1, Animation::AnimationType::loop);
 
 			}
 			else if (direction == Direction::Right || direction == Direction::Jump_Right || (direction == Direction::Jump&&animation.GetCurrentRow() % 2 == 0))
 			{
 				direction = Direction::Stay_Right;
-				animation.setAnimation(0, Animation::AnimationType::loop);
 
 			}
 		}
@@ -105,13 +101,11 @@ void Player::Control()
 		if (direction == Direction::Left || direction == Direction::Jump_Left)
 		{
 			direction = Direction::Stay_Left;
-			animation.setAnimation(9, Animation::AnimationType::once);
 
 		}
 		else if (direction == Direction::Right || direction == Direction::Jump_Right)
 		{
 			direction = Direction::Stay_Right;
-			animation.setAnimation(8, Animation::AnimationType::once);
 
 		}
 	}
@@ -121,76 +115,194 @@ void Player::Update(double time)
 {
 
 
-	/*switch (this->direction)
+	switch (this->direction)
 	{
+	case Direction::Stay_Left:
+		if (OnGround)
+			body->SetLinearVelocity(b2Vec2(0, body->GetLinearVelocity().y));
+		animation.setAnimation(1, Animation::AnimationType::loop);
 
+		break;
+	case Direction::Stay_Right:
+		if (OnGround)
+			body->SetLinearVelocity(b2Vec2(0, body->GetLinearVelocity().y));
+		animation.setAnimation(0, Animation::AnimationType::loop);
+
+
+		break;
 	case  Direction::Left:
-		x -= Speed * time;
+		if (OnGround)
+		{
+			body->SetLinearVelocity(b2Vec2(-Speed, body->GetLinearVelocity().y));
+			animation.setAnimation(3, Animation::AnimationType::loop);
 
+		}
 		break;
 	case  Direction::Right:
-		x += Speed * time;
+		if (OnGround)
+		{
+			body->SetLinearVelocity(b2Vec2(Speed, body->GetLinearVelocity().y));
+			animation.setAnimation(2, Animation::AnimationType::loop);
 
+		}
 		break;
 	case  Direction::Jump_Right:
-		x += Speed * time;
-		JumpTime -= time;
-		if (JumpTime > 0)
+		if (currentJumpTime > 0)
 		{
-			currentJumpPower -= 100 * time;
-			y -= currentJumpPower * time;
+			currentJumpTime -= time;
+
+			OnGround = 0;
+			body->SetLinearVelocity(b2Vec2(Speed, -Speed));
+			animation.setAnimation(4, Animation::AnimationType::once);
+
+
 		}
 		else
 		{
-			currentJumpPower += 100 * time;
-			y += currentJumpPower * time;
+			EnableJump = 0;
+			if (OnGround)
+				direction = Stay_Right;
+
 		}
 		break;
 	case  Direction::Jump_Left:
-		x -= Speed * time;
-		JumpTime -= time;
-		if (JumpTime > 0)
+		if (currentJumpTime > 0)
 		{
-			currentJumpPower -= 100 * time;
-			y -= currentJumpPower * time;
+			currentJumpTime -= time;
+
+			OnGround = 0;
+			body->SetLinearVelocity(b2Vec2(-Speed, -Speed));
+			animation.setAnimation(5, Animation::AnimationType::once);
+
 		}
 		else
 		{
-			currentJumpPower += 100 * time;
-			y += currentJumpPower * time;
-
+			EnableJump = 0;
+			if (OnGround)
+				direction = Stay_Left;
 		}
 		break;
 	case  Direction::Jump:
-		JumpTime -= time;
-		if (JumpTime > 0)
+		if (currentJumpTime > 0)
 		{
-			currentJumpPower -= 100 * time;
-			y -= currentJumpPower * time;
+			currentJumpTime -= time;
+			OnGround = 0;
+			body->SetLinearVelocity(b2Vec2(0, -Speed));
+			if (animation.GetCurrentRow() % 2 != 0)
+				animation.setAnimation(5, Animation::AnimationType::once);
+			else
+				animation.setAnimation(4, Animation::AnimationType::once);
+
 		}
 		else
 		{
-			currentJumpPower += 100 * time;
-			y += currentJumpPower * time;
-
+			EnableJump = 0;
+			if (OnGround)
+			{
+				if (animation.GetCurrentRow() % 2 != 0)
+					direction = Stay_Left;
+				else
+					direction = Stay_Right;
+			}
 		}
 		break;
 
-	}*/
-	
+	}
+	if (!isAlive)
+	{
+		if (direction == Direction::Left || direction == Direction::Jump_Left || direction == Direction::Stay_Left)
+		{
+			animation.setAnimation(9, Animation::AnimationType::once);
+		}
+		else if (direction == Direction::Right || direction == Direction::Jump_Right || direction == Direction::Stay_Right)
+		{
+			animation.setAnimation(8, Animation::AnimationType::once);
+		}
+	}
+	else if (isHurt)
+	{
+
+		if (direction == Direction::Left || direction == Direction::Jump_Left || direction == Direction::Stay_Left)
+		{
+			isHurt = !animation.setAnimation(7, Animation::AnimationType::once);
+
+		}
+		else if (direction == Direction::Right || direction == Direction::Jump_Right || direction == Direction::Stay_Right)
+		{
+			isHurt = !animation.setAnimation(6, Animation::AnimationType::once);
+		}
+
+	}
+
+	if (body->GetLinearVelocity().y == 0)
+	{
+		OnGround = 1;
+		if (currentJumpTime >= JumpTime)
+		{
+			currentJumpTime = JumpTime;
+			EnableJump = 1;
+		}
+		else
+		{
+
+			currentJumpTime += time;
+		}
+	}
+
+	body->SetFixedRotation(1);
+	x = body->GetPosition().x*SCALE;
+	y = body->GetPosition().y * SCALE;
+	x -= width / 2;
+	y -= height / 2;
 	animation.Animate(4 * time);
-	animation.setPosition(x - 75, y - height);
+	animation.setPosition(x - 20, y);
 	rect.setPosition(sf::Vector2f(x, y));
 }
 void Player::SetCamera(sf::View & camera)
 {
-	if (direction == Direction::Jump || direction == Direction::Jump_Left || direction == Direction::Jump_Right)
+	if (!OnGround)
 	{
-		camera.setCenter(x, camera.getCenter().y);
+		if (camera.getCenter().y < y + height)
+		{
+			sf::Vector2f vec = camera.getCenter();
+			if (vec.y < y) {
+				vec.y += body->GetLinearVelocity().y / 2;
+				camera.setCenter(x, vec.y);
+
+			}
+			else
+			{
+				camera.setCenter(x, camera.getCenter().y);
+
+			}
+		}
+		else
+		{
+			camera.setCenter(x, camera.getCenter().y);
+		}
 	}
 	else
 	{
-		camera.setCenter(x, y - camera.getSize().y / 4);
+		if (camera.getCenter().y < y - 3 || camera.getCenter().y > y + 3)
+		{
+			sf::Vector2f vec = camera.getCenter();
+			if (vec.y < y) {
+				vec.y += 1;
+				camera.setCenter(x, vec.y);
+			}
+			else
+			{
+				vec.y -= 1;
+				camera.setCenter(x, vec.y);
+
+			}
+
+		}
+		else
+		{
+
+			camera.setCenter(x, y);
+		}
 
 	}
 }

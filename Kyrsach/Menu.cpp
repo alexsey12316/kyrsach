@@ -8,11 +8,11 @@
 
 void Game(sf::RenderWindow & window)
 {
-	window.setFramerateLimit(60);
+	window.setFramerateLimit(70);
 	Level lvl;
-	lvl.LoadFromFile("maps/test.tmx");
-
-	Player p(150, 500);
+	lvl.LoadFromFile("maps/map2.tmx");
+	b2World *world = lvl.GetWorld();
+	Player p(world,150, 500);
 
 
 
@@ -33,6 +33,7 @@ void Game(sf::RenderWindow & window)
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
+		world->Step(1 / 60.0f, 8, 3);
 		p.Control();
 		p.Update(time);
 		p.SetCamera(camera);

@@ -3,7 +3,7 @@
 class Player :public Entity
 {
 public:
-	Player(double x, double y);
+	Player(b2World *world,double x, double y);
 	void Control();
 	void Update(double time)override;
 	void SetCamera(sf::View &camera);
