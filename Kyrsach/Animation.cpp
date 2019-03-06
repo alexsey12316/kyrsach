@@ -118,6 +118,8 @@ bool Animation::setAnimation(int currentRow, AnimationType type)
 	this->currentRow = currentRow;
 	this->animationType = type;
 
+	//std::cout << currentFrame << "\t" << columns - 1 << "\n";
+
 	if (currentFrame == columns-1)
 		return 1;
 	else

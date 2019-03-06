@@ -1,12 +1,12 @@
 #include "Player.h"
 
-#define RECT
+//#define RECT
 
 Player::Player(b2World *world, double x, double y) :Entity(x, y)
 {
 	height = 100;
 	width = 60;
-
+	this->world = world;
 	b2BodyDef definition;
 	definition.type = b2BodyType::b2_dynamicBody;
 	definition.position.Set((x + width / 2) / SCALE, (height / 2 + y) / SCALE);
@@ -18,6 +18,7 @@ Player::Player(b2World *world, double x, double y) :Entity(x, y)
 	fixture.density = 1;
 	body = world->CreateBody(&definition);
 	body->CreateFixture(&fixture);
+	body->SetFixedRotation(1);
 
 	health = 100;
 	MaxHealth = 100;
@@ -27,11 +28,12 @@ Player::Player(b2World *world, double x, double y) :Entity(x, y)
 	animation.setPosition(x - 20, height);
 	OnGround = 0;
 	direction = Direction::Stay_Right;
-	
+
 	rect.setSize(sf::Vector2f(width, height));
 	rect.setPosition(sf::Vector2f(x, y));
 	rect.setFillColor(sf::Color::Green);
 	Speed = 4;
+	powerJump = 5;
 	JumpTime = currentJumpTime = 0.7;
 	EnableJump = 0;
 
@@ -42,13 +44,38 @@ void Player::Control()
 	if (isHurt&&isAlive)
 	{
 
-	
+
 
 
 	}
+	else if (isAlive && !OnGround)
+	{
+		if (direction == Direction::Jump_Left || direction == Direction::Jump_Right)
+		{
+			direction = Direction::Jump;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			if (direction == Direction::Jump)
+			{
+				direction = Direction::Jump_Left;
+			}
+
+
+
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		{
+			if (direction == Direction::Jump)
+			{
+				direction = Direction::Jump_Right;
+			}
+
+		}
+	}
 	else if (isAlive&&OnGround)
 	{
-	
+
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::W) && EnableJump)
 		{
 			direction = Direction::Jump_Left;
@@ -152,14 +179,16 @@ void Player::Update(double time)
 			currentJumpTime -= time;
 
 			OnGround = 0;
-			body->SetLinearVelocity(b2Vec2(Speed, -Speed));
+			body->SetLinearVelocity(b2Vec2(Speed, -powerJump));
 			animation.setAnimation(4, Animation::AnimationType::once);
 
 
 		}
 		else
 		{
+			animation.setAnimation(4, Animation::AnimationType::once);
 			EnableJump = 0;
+			body->SetLinearVelocity(b2Vec2(Speed, body->GetLinearVelocity().y));
 			if (OnGround)
 				direction = Stay_Right;
 
@@ -171,12 +200,14 @@ void Player::Update(double time)
 			currentJumpTime -= time;
 
 			OnGround = 0;
-			body->SetLinearVelocity(b2Vec2(-Speed, -Speed));
+			body->SetLinearVelocity(b2Vec2(-Speed, -powerJump));
 			animation.setAnimation(5, Animation::AnimationType::once);
 
 		}
 		else
 		{
+			animation.setAnimation(5, Animation::AnimationType::once);
+			body->SetLinearVelocity(b2Vec2(-Speed, body->GetLinearVelocity().y));
 			EnableJump = 0;
 			if (OnGround)
 				direction = Stay_Left;
@@ -187,7 +218,7 @@ void Player::Update(double time)
 		{
 			currentJumpTime -= time;
 			OnGround = 0;
-			body->SetLinearVelocity(b2Vec2(0, -Speed));
+			body->SetLinearVelocity(b2Vec2(0, -powerJump));
 			if (animation.GetCurrentRow() % 2 != 0)
 				animation.setAnimation(5, Animation::AnimationType::once);
 			else
@@ -197,6 +228,8 @@ void Player::Update(double time)
 		else
 		{
 			EnableJump = 0;
+			body->SetLinearVelocity(b2Vec2(0, body->GetLinearVelocity().y));
+
 			if (OnGround)
 			{
 				if (animation.GetCurrentRow() % 2 != 0)
@@ -234,6 +267,7 @@ void Player::Update(double time)
 
 	}
 
+
 	if (body->GetLinearVelocity().y == 0)
 	{
 		OnGround = 1;
@@ -245,11 +279,10 @@ void Player::Update(double time)
 		else
 		{
 
-			currentJumpTime += time;
+			currentJumpTime += 2 * time;
 		}
 	}
 
-	body->SetFixedRotation(1);
 	x = body->GetPosition().x*SCALE;
 	y = body->GetPosition().y * SCALE;
 	x -= width / 2;
@@ -305,6 +338,33 @@ void Player::SetCamera(sf::View & camera)
 		}
 
 	}
+}
+b2World * Player::GetWorldPointer()
+{
+	return world;
+}
+Entity::Direction Player::GetDirection()
+{
+	return direction;
+}
+void Player::SetMagic(std::list<Magic*>& magic)
+{
+	this->magic = &magic;
+}
+void Player::Ability()
+{
+	if (direction == Entity::Direction::Stay_Left || direction == Entity::Direction::Stay_Right)
+		if (isAlive && !isHurt&&OnGround)
+		{
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
+			{
+				if (FireBall::isReady())
+				{
+					FireBall* a = new FireBall(*this);
+					magic->push_back(a);
+				}
+			}
+		}
 }
 sf::Vector2f Player::getPosition()
 {
