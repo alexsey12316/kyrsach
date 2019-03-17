@@ -1,9 +1,12 @@
 #include "Menu.h"
-#include "Level.h"
+
+#include "Enemy.h"
 #include "Player.h"
 #include "Magic.h"
+
 #include<list>
 #include<Windows.h>
+#include<ctime>
 
 #define WIDTH   900
 #define HEIGHT  540
@@ -11,18 +14,27 @@
 
 void Game(sf::RenderWindow & window)
 {
+	srand(time(0));
 	window.setFramerateLimit(70);
 	Level lvl;
 	lvl.LoadFromFile("maps/map2.tmx");
 	b2World *world = lvl.GetWorld();
 	Player p(world, 150, 500);
 
+	
 	std::list<Magic*> magic;
 	p.SetMagic(magic);
 
+
+	std::list<Enemy*> enemies;
+	EnemyKnight_2* a = new EnemyKnight_2(world,200,500);
+	enemies.push_back(a);
+
+	
+
 	sf::View camera;
 	camera.setSize(WIDTH, HEIGHT);
-
+	
 
 
 	double time;
@@ -45,13 +57,30 @@ void Game(sf::RenderWindow & window)
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
+
+
+
 		world->Step(1 / 60.0f, 8, 3);
 		p.Control();
 		p.Ability();
 		p.Update(time);
 		p.SetCamera(camera);
 
-		FireBall::check(time);
+		for (auto Iter = enemies.begin(), end = enemies.end(); Iter != end; )
+		{
+			if ((*Iter)->isDelete())
+			{
+				delete *Iter;
+				Iter = enemies.erase(Iter);
+			}
+			else
+			{
+				(*Iter)->behavior();
+				(*Iter)->Update(time);
+				++Iter;
+			}
+		}
+
 
 		for (auto MagicIter=magic.begin(),end= magic.end();MagicIter!=end; )
 		{
@@ -72,6 +101,11 @@ void Game(sf::RenderWindow & window)
 		window.clear();
 		lvl.Draw(window);
 		p.Draw(window);
+
+		for (auto it : enemies)
+		{
+			it->Draw(window);
+		}
 
 		for (auto it : magic)
 		{

@@ -1,23 +1,28 @@
 #pragma once
-#include<SFML/Graphics.hpp>
 #include<vector>
-#include"Animation.h"
+#include<SFML/Graphics.hpp>
+
 #include"Level.h"
+#include"Animation.h"
+
+class Magic;
 
 class Entity
 {
 public:
 	enum Direction
 	{
-		Left,Right,Stay_Left,Stay_Right,Jump,Jump_Left,Jump_Right
+		Left, Right, Stay_Left, Stay_Right, Jump, Jump_Left, Jump_Right
 	};
-	Entity(double x,double y);
-	Entity(double x,double y,double width,double height);
+	virtual~Entity();
+	Entity(double x, double y);
+	Entity(double x, double y, double width, double height);
 	virtual void Update(double time) = 0;
 	virtual void Draw(sf::RenderWindow &window);
 	virtual void setHealth(double health);
 	virtual void setMaxHealth(double MaxHealth);
-	
+	virtual void SetDamage(Magic *magic);
+
 protected:
 	double x, y;
 	double width, height;
@@ -33,7 +38,24 @@ protected:
 	bool EnableJump;
 	double JumpTime;
 	double currentJumpTime;
+	double powerJump;
 	b2Body *body;
 	b2World *world;
+
+	double increaseFireDamage;
+	double increaseWaterDamage;
+	double increaseEarthDamage;
+	double increaseAirDamage;
+	double increaseDarkDamage;
+	double increaseLightDamage;
+
+	double FireProtection;
+	double WaterProtection;
+	double EarthProtection;
+	double AirProtection;
+	double DarkProtection;
+	double LightProtection;
+
+
 };
 

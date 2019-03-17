@@ -1,12 +1,13 @@
 #pragma once
-#include"Animation.h"
-#include"Box2D/Box2D.h"
 #include<SFML/Audio.hpp>
-#include"Player.h"
+#include<SFML/Graphics.hpp>
+#include"Box2D/Box2D.h"
+#include"Animation.h"
 
 //#define DEBUG 
 
 class Player;
+
 class Magic
 {
 public:
@@ -21,6 +22,8 @@ public:
 	virtual void UpDate(double time) = 0;
 	virtual void Draw(sf::RenderWindow &window);
 	virtual bool isDestroy();
+	Element GetElement();
+	double GetDamage(Element &el);
 
 protected:
 	Direction direction;
@@ -41,6 +44,9 @@ protected:
 	double speed;
 	bool initialization;
 	bool destroy;
+	Element element;
+
+	void CheckCollision();
 };
 
 
@@ -50,12 +56,10 @@ public:
 	 FireBall(Player &player);
 	~FireBall();
 	void UpDate(double time)override;
-	static bool isReady();
-	static void check(double time);
-
+	static double Consumption();
+	
 private:
-	static double RollTime;
-	static bool isAvailable;
-	static double RollBack;
+	
+	static double consumption;
 };
 

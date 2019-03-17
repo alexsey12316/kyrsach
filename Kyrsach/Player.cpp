@@ -1,5 +1,7 @@
 #include "Player.h"
 
+#include "Magic.h"
+
 //#define RECT
 
 Player::Player(b2World *world, double x, double y) :Entity(x, y)
@@ -19,12 +21,11 @@ Player::Player(b2World *world, double x, double y) :Entity(x, y)
 	body = world->CreateBody(&definition);
 	body->CreateFixture(&fixture);
 	body->SetFixedRotation(1);
+	body->SetUserData(this);
 
-	health = 100;
-	MaxHealth = 100;
 	animation.setFrameSize(height, height);
 	animation.setImage("character/player.png");
-	animation.setSize(10, 6);
+	animation.setSize(12, 6);
 	animation.setPosition(x - 20, height);
 	OnGround = 0;
 	direction = Direction::Stay_Right;
@@ -32,16 +33,21 @@ Player::Player(b2World *world, double x, double y) :Entity(x, y)
 	rect.setSize(sf::Vector2f(width, height));
 	rect.setPosition(sf::Vector2f(x, y));
 	rect.setFillColor(sf::Color::Green);
+	EnableJump = 0;
+	isCasting = 0;
+	ManaTimer = 0;
+
+	health = MaxHealth = 100;
+	mana = MaxMana = 100;
+	ManaPerTime = 1;
 	Speed = 4;
 	powerJump = 5;
 	JumpTime = currentJumpTime = 0.7;
-	EnableJump = 0;
-
 }
 
 void Player::Control()
 {
-	if (isHurt&&isAlive)
+	if (isHurt&&isAlive|| isCasting&&isAlive)
 	{
 
 
@@ -266,6 +272,18 @@ void Player::Update(double time)
 		}
 
 	}
+	else if (isCasting)
+	{
+		if ( direction == Direction::Stay_Left)
+		{
+			isCasting = !animation.setAnimation(11, Animation::AnimationType::once);
+
+		}
+		else if (direction == Direction::Stay_Right)
+		{
+			isCasting = !animation.setAnimation(10, Animation::AnimationType::once);
+		}
+	}
 
 
 	if (body->GetLinearVelocity().y == 0)
@@ -282,7 +300,18 @@ void Player::Update(double time)
 			currentJumpTime += 2 * time;
 		}
 	}
-
+	std::cout << mana << std::endl;
+	if (mana < MaxMana)
+	{
+		ManaTimer += time;
+		if (ManaTimer >= 1)
+		{
+			mana += ManaPerTime;
+			ManaTimer -= 1;
+			if (mana > MaxMana)
+				mana = MaxMana;
+		}
+	}
 	x = body->GetPosition().x*SCALE;
 	y = body->GetPosition().y * SCALE;
 	x -= width / 2;
@@ -291,6 +320,7 @@ void Player::Update(double time)
 	animation.setPosition(x - 20, y);
 	rect.setPosition(sf::Vector2f(x, y));
 }
+
 void Player::SetCamera(sf::View & camera)
 {
 	if (!OnGround)
@@ -339,33 +369,40 @@ void Player::SetCamera(sf::View & camera)
 
 	}
 }
+
 b2World * Player::GetWorldPointer()
 {
 	return world;
 }
+
 Entity::Direction Player::GetDirection()
 {
 	return direction;
 }
+
 void Player::SetMagic(std::list<Magic*>& magic)
 {
 	this->magic = &magic;
 }
+
 void Player::Ability()
 {
 	if (direction == Entity::Direction::Stay_Left || direction == Entity::Direction::Stay_Right)
-		if (isAlive && !isHurt&&OnGround)
+		if (isAlive && !isHurt&&OnGround&&!isCasting)
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
 			{
-				if (FireBall::isReady())
+				if (this->mana>FireBall::Consumption())
 				{
+					mana -= FireBall::Consumption();
+					isCasting = 1;
 					FireBall* a = new FireBall(*this);
 					magic->push_back(a);
 				}
 			}
 		}
 }
+
 sf::Vector2f Player::getPosition()
 {
 	return sf::Vector2f(this->x, this->y);

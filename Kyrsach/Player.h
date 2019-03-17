@@ -1,15 +1,10 @@
 #pragma once
 
-#ifndef PLAYER_H
-#define PLAYER_H
-
-
 #include "Entity.h"
 #include<list>
-#include"Magic.h"
 
 
-class Magic;
+//class Entity;
 class Player :public Entity
 {
 public:
@@ -21,13 +16,16 @@ public:
 	Direction GetDirection();
 	void SetMagic(std::list<Magic*> &magic);
 	void Ability();
-
-	sf::Vector2f getPosition();
 	void Draw(sf::RenderWindow &window)override;
+	sf::Vector2f getPosition();
 
 private:
-	double powerJump;
+	bool isCasting;
 	std::list<Magic*> *magic;
+	double mana;
+	double MaxMana;
+	double ManaPerTime;
+	double ManaTimer;
+
 };
 
-#endif // !PLAYER_H
