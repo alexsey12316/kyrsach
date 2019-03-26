@@ -8,7 +8,7 @@
 class Player :public Entity
 {
 public:
-	Player(b2World *world,double x, double y);
+	Player(b2World *world,double x, double y,sf::View &camera);
 	void Control();
 	void Update(double time)override;
 	void SetCamera(sf::View &camera);
@@ -18,6 +18,7 @@ public:
 	void Ability();
 	void Draw(sf::RenderWindow &window)override;
 	sf::Vector2f getPosition();
+	bool isOnGround();
 
 private:
 	bool isCasting;

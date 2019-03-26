@@ -5,10 +5,11 @@
 
 Entity::~Entity()
 {
-	world->DestroyBody(body);
+	if (body != nullptr)
+		world->DestroyBody(body);
 }
 
-Entity::Entity(double x,double y)
+Entity::Entity(double x, double y)
 {
 	this->x = x;
 	this->y = y;
@@ -20,16 +21,18 @@ Entity::Entity(double x,double y)
 	increaseEarthDamage = 0;
 	increaseLightDamage = 0;
 	increaseDarkDamage = 0;
-	
+
 	LightProtection = 0;
 	DarkProtection = 0;
 	FireProtection = 0;
 	WaterProtection = 0;
 	EarthProtection = 0;
 	AirProtection = 0;
+
+	armor = 0;
 }
 
-Entity::Entity(double x, double y, double width, double height):Entity(x,y)
+Entity::Entity(double x, double y, double width, double height) :Entity(x, y)
 {
 	this->width = width;
 	this->height = height;
@@ -123,6 +126,12 @@ void Entity::SetDamage(Magic * magic)
 		break;
 	}
 
+}
+
+void Entity::SetDamage(double damage)
+{
+	isHurt = 1;
+	health -= damage - damage * armor / 100;
 }
 
 

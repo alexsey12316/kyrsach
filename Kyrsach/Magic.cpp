@@ -1,6 +1,7 @@
 #include "Magic.h"
 
 #include "Player.h"
+#include "Enemy.h"
 
 
 
@@ -65,14 +66,20 @@ void Magic::CheckCollision()
 	if (!destroy)
 		for (auto i = body->GetContactList(); i != nullptr; i = i->next)
 			if (body->GetContactList()->contact->IsTouching())
-				if (body->GetContactList()->contact->GetFixtureA()->GetBody()->GetUserData() != body->GetUserData())
+				if (body->GetContactList()->contact->GetFixtureA()->GetBody()->GetUserData() != body->GetUserData()&&!destroy)
 				{
-					destroy = 1;
-
-					Entity*value = static_cast<Entity*>(body->GetContactList()->contact->GetFixtureA()->GetBody()->GetUserData());
-					if (value != nullptr)
+					if (!body->GetContactList()->contact->GetFixtureA()->IsSensor())
 					{
-						value->SetDamage(this);
+						destroy = 1;
+
+						Entity*value = static_cast<Entity*>(body->GetContactList()->contact->GetFixtureA()->GetBody()->GetUserData());
+						if (value != nullptr)
+						{
+							value->SetDamage(this);
+							Enemy *value2 = static_cast<Enemy *>(value);
+							if (value2 != nullptr)
+								value2->SetTarget(static_cast<Player*>(this->body->GetUserData()));
+						}
 					}
 				}
 }
@@ -97,12 +104,12 @@ FireBall::FireBall(Player &player)
 	if (player.GetDirection() == Entity::Direction::Stay_Left)
 	{
 		direction = Left;
-		definition.position.Set((x - 70) / SCALE, (y + 70) / SCALE);
+		definition.position.Set((x - 30) / SCALE, (y + 70) / SCALE);
 	}
 	else if (player.GetDirection() == Entity::Direction::Stay_Right)
 	{
 		direction = Right;
-		definition.position.Set((x + 126) / SCALE, (y + 70) / SCALE);
+		definition.position.Set((x + 80) / SCALE, (y + 70) / SCALE);
 	}
 	rect.setSize(sf::Vector2f(80, 48));
 	rect.setPosition(sf::Vector2f(x, y));
@@ -177,11 +184,12 @@ void FireBall::UpDate(double time)
 				animation.setPosition(x - 60, y - 24);
 			}
 			CheckCollision();
-			
+
 		}
 	}
 
-	initialization ? animation.Animate(6 * time) : animation.Animate(8 * time);
+	//initialization ? animation.Animate(6 * time) : animation.Animate(8 * time);
+	animation.Animate(10 * time);
 }
 
 

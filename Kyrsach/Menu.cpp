@@ -16,31 +16,36 @@ void Game(sf::RenderWindow & window)
 {
 	srand(time(0));
 	window.setFramerateLimit(70);
+	sf::View camera;
 	Level lvl;
 	lvl.LoadFromFile("maps/map2.tmx");
 	b2World *world = lvl.GetWorld();
-	Player p(world, 150, 500);
+	std::vector<sf::Vector2f> *enemyCoords = lvl.GetEnemyVector();
 
-	
 	std::list<Magic*> magic;
+
+	Player p(world, enemyCoords->at(0).x, enemyCoords->at(0).y, camera);
+
+	std::list<Enemy*> enemies;
+	for (size_t i = 1; i < enemyCoords->size(); i++)
+	{
+		EnemyKnight_2* a = new EnemyKnight_2(world, enemyCoords->at(i).x, enemyCoords->at(i).y);
+
+		enemies.push_back(a);
+	}
+
 	p.SetMagic(magic);
 
 
-	std::list<Enemy*> enemies;
-	EnemyKnight_2* a = new EnemyKnight_2(world,200,500);
-	enemies.push_back(a);
-
-	
-
-	sf::View camera;
 	camera.setSize(WIDTH, HEIGHT);
-	
+
 
 
 	double time;
 	sf::Clock clock;
 	while (window.isOpen())
 	{
+		//CameraMovement(camera);
 #ifdef FRAMERATE
 		system("cls");
 #endif // FRAMERATE
@@ -50,7 +55,7 @@ void Game(sf::RenderWindow & window)
 #ifdef FRAMERATE
 		std::cout << 1 / time << "\n";
 #endif // FRAMERATE
-	
+
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -65,7 +70,6 @@ void Game(sf::RenderWindow & window)
 		p.Ability();
 		p.Update(time);
 		p.SetCamera(camera);
-
 		for (auto Iter = enemies.begin(), end = enemies.end(); Iter != end; )
 		{
 			if ((*Iter)->isDelete())
@@ -75,24 +79,24 @@ void Game(sf::RenderWindow & window)
 			}
 			else
 			{
-				(*Iter)->behavior();
+				(*Iter)->behavior(time);
 				(*Iter)->Update(time);
 				++Iter;
 			}
 		}
 
 
-		for (auto MagicIter=magic.begin(),end= magic.end();MagicIter!=end; )
+		for (auto MagicIter = magic.begin(), end = magic.end(); MagicIter != end; )
 		{
 			if ((*MagicIter)->isDestroy())
 			{
 				delete *MagicIter;
-				MagicIter=magic.erase(MagicIter);
+				MagicIter = magic.erase(MagicIter);
 			}
 			else
 			{
-			(*MagicIter)->UpDate(time);
-			++MagicIter;
+				(*MagicIter)->UpDate(time);
+				++MagicIter;
 			}
 		}
 
@@ -130,23 +134,23 @@ void Game(sf::RenderWindow & window)
 void CameraMovement(sf::View & camera)
 {
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		camera.move(0, -1);
+		camera.move(0, -5);
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		camera.move(0, 1);
+		camera.move(0, 5);
 
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		camera.move(-1, 0);
+		camera.move(-5, 0);
 
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		camera.move(1, 0);
+		camera.move(5, 0);
 
 	}
 

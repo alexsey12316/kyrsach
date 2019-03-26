@@ -22,6 +22,7 @@ public:
 	virtual void setHealth(double health);
 	virtual void setMaxHealth(double MaxHealth);
 	virtual void SetDamage(Magic *magic);
+	virtual void SetDamage(double damage);
 
 protected:
 	double x, y;
@@ -56,6 +57,6 @@ protected:
 	double DarkProtection;
 	double LightProtection;
 
-
+	double armor;
 };
 

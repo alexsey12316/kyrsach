@@ -10,7 +10,7 @@ using namespace sf;
 bool Level::LoadFromFile(string filename)
 {
 	string path;
-	path = filename.substr(0,filename.find_last_of('/')+1);
+	path = filename.substr(0, filename.find_last_of('/') + 1);
 	TiXmlDocument levelFile(filename.c_str());
 
 	if (!levelFile.LoadFile())
@@ -193,7 +193,7 @@ bool Level::LoadFromFile(string filename)
 		layerElement = layerElement->NextSiblingElement("layer");
 	}
 
-	
+
 	MapTexture.create(width*tileWidth, height*tileHeight);
 
 	for (unsigned int layer = 0; layer < layers.size(); layer++)
@@ -280,7 +280,10 @@ bool Level::LoadFromFile(string filename)
 
 					delete[] points;
 				}
-
+				else if (objectElement->FirstChildElement("point") != NULL)
+				{
+					EnemyCoordinats.push_back(sf::Vector2f(x, y));
+				}
 				objectElement = objectElement->NextSiblingElement("object");
 			}
 			objectGroupElement = objectGroupElement->NextSiblingElement("objectgroup");
@@ -378,6 +381,11 @@ void Level::DrawTiles(RenderWindow & window, View & camera)
 
 #endif // DRAW
 
+}
+
+vector<Vector2f>* Level::GetEnemyVector()
+{
+	return &EnemyCoordinats;
 }
 
 FloatRect Level::GetViewRegion(View & camera)

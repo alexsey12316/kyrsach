@@ -4,8 +4,9 @@
 
 //#define RECT
 
-Player::Player(b2World *world, double x, double y) :Entity(x, y)
+Player::Player(b2World *world, double x, double y,sf::View &camera) :Entity(x, y)
 {
+	camera.setCenter(x, y);
 	height = 100;
 	width = 60;
 	this->world = world;
@@ -146,107 +147,6 @@ void Player::Control()
 
 void Player::Update(double time)
 {
-
-
-	switch (this->direction)
-	{
-	case Direction::Stay_Left:
-		if (OnGround)
-			body->SetLinearVelocity(b2Vec2(0, body->GetLinearVelocity().y));
-		animation.setAnimation(1, Animation::AnimationType::loop);
-
-		break;
-	case Direction::Stay_Right:
-		if (OnGround)
-			body->SetLinearVelocity(b2Vec2(0, body->GetLinearVelocity().y));
-		animation.setAnimation(0, Animation::AnimationType::loop);
-
-
-		break;
-	case  Direction::Left:
-		if (OnGround)
-		{
-			body->SetLinearVelocity(b2Vec2(-Speed, body->GetLinearVelocity().y));
-			animation.setAnimation(3, Animation::AnimationType::loop);
-
-		}
-		break;
-	case  Direction::Right:
-		if (OnGround)
-		{
-			body->SetLinearVelocity(b2Vec2(Speed, body->GetLinearVelocity().y));
-			animation.setAnimation(2, Animation::AnimationType::loop);
-
-		}
-		break;
-	case  Direction::Jump_Right:
-		if (currentJumpTime > 0)
-		{
-			currentJumpTime -= time;
-
-			OnGround = 0;
-			body->SetLinearVelocity(b2Vec2(Speed, -powerJump));
-			animation.setAnimation(4, Animation::AnimationType::once);
-
-
-		}
-		else
-		{
-			animation.setAnimation(4, Animation::AnimationType::once);
-			EnableJump = 0;
-			body->SetLinearVelocity(b2Vec2(Speed, body->GetLinearVelocity().y));
-			if (OnGround)
-				direction = Stay_Right;
-
-		}
-		break;
-	case  Direction::Jump_Left:
-		if (currentJumpTime > 0)
-		{
-			currentJumpTime -= time;
-
-			OnGround = 0;
-			body->SetLinearVelocity(b2Vec2(-Speed, -powerJump));
-			animation.setAnimation(5, Animation::AnimationType::once);
-
-		}
-		else
-		{
-			animation.setAnimation(5, Animation::AnimationType::once);
-			body->SetLinearVelocity(b2Vec2(-Speed, body->GetLinearVelocity().y));
-			EnableJump = 0;
-			if (OnGround)
-				direction = Stay_Left;
-		}
-		break;
-	case  Direction::Jump:
-		if (currentJumpTime > 0)
-		{
-			currentJumpTime -= time;
-			OnGround = 0;
-			body->SetLinearVelocity(b2Vec2(0, -powerJump));
-			if (animation.GetCurrentRow() % 2 != 0)
-				animation.setAnimation(5, Animation::AnimationType::once);
-			else
-				animation.setAnimation(4, Animation::AnimationType::once);
-
-		}
-		else
-		{
-			EnableJump = 0;
-			body->SetLinearVelocity(b2Vec2(0, body->GetLinearVelocity().y));
-
-			if (OnGround)
-			{
-				if (animation.GetCurrentRow() % 2 != 0)
-					direction = Stay_Left;
-				else
-					direction = Stay_Right;
-			}
-		}
-		break;
-
-	}
 	if (!isAlive)
 	{
 		if (direction == Direction::Left || direction == Direction::Jump_Left || direction == Direction::Stay_Left)
@@ -284,8 +184,108 @@ void Player::Update(double time)
 			isCasting = !animation.setAnimation(10, Animation::AnimationType::once);
 		}
 	}
+	else
+	{
+		switch (this->direction)
+		{
+		case Direction::Stay_Left:
+			if (OnGround)
+				body->SetLinearVelocity(b2Vec2(0, body->GetLinearVelocity().y));
+			animation.setAnimation(1, Animation::AnimationType::loop);
+
+			break;
+		case Direction::Stay_Right:
+			if (OnGround)
+				body->SetLinearVelocity(b2Vec2(0, body->GetLinearVelocity().y));
+			animation.setAnimation(0, Animation::AnimationType::loop);
 
 
+			break;
+		case  Direction::Left:
+			if (OnGround)
+			{
+				body->SetLinearVelocity(b2Vec2(-Speed, body->GetLinearVelocity().y));
+				animation.setAnimation(3, Animation::AnimationType::loop);
+
+			}
+			break;
+		case  Direction::Right:
+			if (OnGround)
+			{
+				body->SetLinearVelocity(b2Vec2(Speed, body->GetLinearVelocity().y));
+				animation.setAnimation(2, Animation::AnimationType::loop);
+
+			}
+			break;
+		case  Direction::Jump_Right:
+			if (currentJumpTime > 0)
+			{
+				currentJumpTime -= time;
+
+				OnGround = 0;
+				body->SetLinearVelocity(b2Vec2(Speed, -powerJump));
+				animation.setAnimation(4, Animation::AnimationType::once);
+
+
+			}
+			else
+			{
+				animation.setAnimation(4, Animation::AnimationType::once,0);
+				EnableJump = 0;
+				body->SetLinearVelocity(b2Vec2(Speed, body->GetLinearVelocity().y));
+				if (OnGround)
+					direction = Stay_Right;
+
+			}
+			break;
+		case  Direction::Jump_Left:
+			if (currentJumpTime > 0)
+			{
+				currentJumpTime -= time;
+
+				OnGround = 0;
+				body->SetLinearVelocity(b2Vec2(-Speed, -powerJump));
+				animation.setAnimation(5, Animation::AnimationType::once);
+
+			}
+			else
+			{
+				animation.setAnimation(5, Animation::AnimationType::once,0);
+				body->SetLinearVelocity(b2Vec2(-Speed, body->GetLinearVelocity().y));
+				EnableJump = 0;
+				if (OnGround)
+					direction = Stay_Left;
+			}
+			break;
+		case  Direction::Jump:
+			if (currentJumpTime > 0)
+			{
+				currentJumpTime -= time;
+				OnGround = 0;
+				body->SetLinearVelocity(b2Vec2(0, -powerJump));
+				if (animation.GetCurrentRow() % 2 != 0)
+					animation.setAnimation(5, Animation::AnimationType::once);
+				else
+					animation.setAnimation(4, Animation::AnimationType::once);
+
+			}
+			else
+			{
+				EnableJump = 0;
+				body->SetLinearVelocity(b2Vec2(0, body->GetLinearVelocity().y));
+
+				if (OnGround)
+				{
+					if (animation.GetCurrentRow() % 2 != 0)
+						direction = Stay_Left;
+					else
+						direction = Stay_Right;
+				}
+			}
+			break;
+
+		}
+	}
 	if (body->GetLinearVelocity().y == 0)
 	{
 		OnGround = 1;
@@ -300,7 +300,6 @@ void Player::Update(double time)
 			currentJumpTime += 2 * time;
 		}
 	}
-	std::cout << mana << std::endl;
 	if (mana < MaxMana)
 	{
 		ManaTimer += time;
@@ -312,11 +311,16 @@ void Player::Update(double time)
 				mana = MaxMana;
 		}
 	}
+	if (health < 0)
+	{
+		health = 0;
+		isAlive = 0;
+	}
 	x = body->GetPosition().x*SCALE;
 	y = body->GetPosition().y * SCALE;
 	x -= width / 2;
 	y -= height / 2;
-	animation.Animate(4 * time);
+	animation.Animate(10 * time);
 	animation.setPosition(x - 20, y);
 	rect.setPosition(sf::Vector2f(x, y));
 }
@@ -406,6 +410,11 @@ void Player::Ability()
 sf::Vector2f Player::getPosition()
 {
 	return sf::Vector2f(this->x, this->y);
+}
+
+bool Player::isOnGround()
+{
+	return OnGround;
 }
 
 void Player::Draw(sf::RenderWindow & window)

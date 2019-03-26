@@ -113,11 +113,15 @@ void Animation::Animate(double time)
 
 }
 
-bool Animation::setAnimation(int currentRow, AnimationType type)
+bool Animation::setAnimation(int currentRow, AnimationType type,bool restart)
 {
+	if (this->currentRow != currentRow&&restart)
+	{
+		progress = 0;
+		//return 1;
+	}
 	this->currentRow = currentRow;
 	this->animationType = type;
-
 	//std::cout << currentFrame << "\t" << columns - 1 << "\n";
 
 	if (currentFrame == columns-1)

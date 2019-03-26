@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="8">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="17">
  <tileset firstgid="1" name="tiles" tilewidth="32" tileheight="32" tilecount="400" columns="20">
   <image source="tiles.png" width="640" height="640"/>
  </tileset>
@@ -8217,6 +8217,23 @@
   </object>
   <object id="7" name="solid" x="1759" y="1862">
    <polygon points="25,8 155,-131 286,-129 282,29 -32,39"/>
+  </object>
+  <object id="9" x="1" y="1331" width="7" height="462" visible="0"/>
+  <object id="10" x="2030" y="1311" width="16" height="422"/>
+  <object id="12" x="164" y="1672">
+   <point/>
+  </object>
+  <object id="13" x="896" y="1668">
+   <point/>
+  </object>
+  <object id="14" x="1192" y="1684">
+   <point/>
+  </object>
+  <object id="15" x="1408" y="1664">
+   <point/>
+  </object>
+  <object id="16" x="1732" y="1656">
+   <point/>
   </object>
  </objectgroup>
 </map>

@@ -20,7 +20,7 @@ public:
 	void draw(sf::RenderWindow & window);
 	void setPosition(double x, double y);
 	void Animate(double time);
-	bool setAnimation(int currentRow, AnimationType type);
+	bool setAnimation(int currentRow, AnimationType type,bool restart=1);
 	int GetCurrentRow();
 
 private:
