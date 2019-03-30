@@ -8,8 +8,8 @@
 #include<Windows.h>
 #include<ctime>
 
-#define WIDTH   900
-#define HEIGHT  540
+#define WIDTH   1280
+#define HEIGHT  720
 //#define FRAMERATE  
 
 void Game(sf::RenderWindow & window)
@@ -18,7 +18,7 @@ void Game(sf::RenderWindow & window)
 	window.setFramerateLimit(70);
 	sf::View camera;
 	Level lvl;
-	lvl.LoadFromFile("maps/map2.tmx");
+	lvl.LoadFromFile("maps/dungeon/dungeon.tmx");
 	b2World *world = lvl.GetWorld();
 	std::vector<sf::Vector2f> *enemyCoords = lvl.GetEnemyVector();
 
@@ -70,6 +70,7 @@ void Game(sf::RenderWindow & window)
 		p.Ability();
 		p.Update(time);
 		p.SetCamera(camera);
+		lvl.SetCavera(camera);
 		for (auto Iter = enemies.begin(), end = enemies.end(); Iter != end; )
 		{
 			if ((*Iter)->isDelete())

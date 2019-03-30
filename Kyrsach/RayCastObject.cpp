@@ -38,12 +38,14 @@ void RayCastObject::upDate(Enemy *enemy)
 	{
 		currentRayAngle = i * DEGTORAD;
 		b2Vec2 p2 = point + rayLength * b2Vec2(sinf(currentRayAngle), cosf(currentRayAngle));
-		Player *temp = nullptr;
-		temp = static_cast<Player *>(RayBuild(p2));
-		if (temp != nullptr)
+
+		Entity *temp = nullptr;
+		temp = static_cast<Entity *>(RayBuild(p2));
+		Player *temp2 = nullptr;
+		temp2 = dynamic_cast<Player*>(temp);
+		if (temp2 != nullptr)
 		{
-				//std::cout << "gatcha" << std::endl;
-			enemy->SetTarget(temp);
+			enemy->SetTarget(temp2);
 		}
 
 	}

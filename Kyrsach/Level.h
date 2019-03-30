@@ -30,6 +30,7 @@ public:
 	void DrawTiles(RenderWindow &window);
 	void Draw(RenderWindow &window);
 	void DrawTiles(RenderWindow &window,View &camera);
+	void SetCavera(View &camera);
 	vector<Vector2f>* GetEnemyVector();
 	FloatRect GetViewRegion(View &camera);
 	Vector2i GetTileSize();

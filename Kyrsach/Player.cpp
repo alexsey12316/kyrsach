@@ -4,7 +4,7 @@
 
 //#define RECT
 
-Player::Player(b2World *world, double x, double y,sf::View &camera) :Entity(x, y)
+Player::Player(b2World *world, double x, double y, sf::View &camera) :Entity(x, y)
 {
 	camera.setCenter(x, y);
 	height = 100;
@@ -41,14 +41,14 @@ Player::Player(b2World *world, double x, double y,sf::View &camera) :Entity(x, y
 	health = MaxHealth = 100;
 	mana = MaxMana = 100;
 	ManaPerTime = 1;
-	Speed = 4;
-	powerJump = 5;
+	Speed = 5;
+	powerJump = 7;
 	JumpTime = currentJumpTime = 0.7;
 }
 
 void Player::Control()
 {
-	if (isHurt&&isAlive|| isCasting&&isAlive)
+	if (isHurt&&isAlive || isCasting && isAlive)
 	{
 
 
@@ -160,7 +160,7 @@ void Player::Update(double time)
 	}
 	else if (isHurt)
 	{
-
+		this->body->SetLinearVelocity(b2Vec2(0, body->GetLinearVelocity().y));
 		if (direction == Direction::Left || direction == Direction::Jump_Left || direction == Direction::Stay_Left)
 		{
 			isHurt = !animation.setAnimation(7, Animation::AnimationType::once);
@@ -174,7 +174,7 @@ void Player::Update(double time)
 	}
 	else if (isCasting)
 	{
-		if ( direction == Direction::Stay_Left)
+		if (direction == Direction::Stay_Left)
 		{
 			isCasting = !animation.setAnimation(11, Animation::AnimationType::once);
 
@@ -230,7 +230,7 @@ void Player::Update(double time)
 			}
 			else
 			{
-				animation.setAnimation(4, Animation::AnimationType::once,0);
+				animation.setAnimation(4, Animation::AnimationType::once, 0);
 				EnableJump = 0;
 				body->SetLinearVelocity(b2Vec2(Speed, body->GetLinearVelocity().y));
 				if (OnGround)
@@ -250,7 +250,7 @@ void Player::Update(double time)
 			}
 			else
 			{
-				animation.setAnimation(5, Animation::AnimationType::once,0);
+				animation.setAnimation(5, Animation::AnimationType::once, 0);
 				body->SetLinearVelocity(b2Vec2(-Speed, body->GetLinearVelocity().y));
 				EnableJump = 0;
 				if (OnGround)
@@ -333,7 +333,7 @@ void Player::SetCamera(sf::View & camera)
 		{
 			sf::Vector2f vec = camera.getCenter();
 			if (vec.y < y) {
-				vec.y += body->GetLinearVelocity().y / 2;
+				vec.y += body->GetLinearVelocity().y / 8;
 				camera.setCenter(x, vec.y);
 
 			}
@@ -392,11 +392,11 @@ void Player::SetMagic(std::list<Magic*>& magic)
 void Player::Ability()
 {
 	if (direction == Entity::Direction::Stay_Left || direction == Entity::Direction::Stay_Right)
-		if (isAlive && !isHurt&&OnGround&&!isCasting)
+		if (isAlive && !isHurt&&OnGround && !isCasting)
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
 			{
-				if (this->mana>FireBall::Consumption())
+				if (this->mana > FireBall::Consumption())
 				{
 					mana -= FireBall::Consumption();
 					isCasting = 1;

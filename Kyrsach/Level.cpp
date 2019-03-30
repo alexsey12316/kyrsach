@@ -383,6 +383,26 @@ void Level::DrawTiles(RenderWindow & window, View & camera)
 
 }
 
+void Level::SetCavera(View & camera)
+{
+	if (camera.getCenter().x - camera.getSize().x / 2 < 0)
+	{
+		camera.setCenter(camera.getSize().x / 2, camera.getCenter().y);
+	}
+	else if ((camera.getCenter().x + camera.getSize().x / 2) > width*tileWidth)
+	{
+		camera.setCenter(width*tileWidth - camera.getSize().x / 2, camera.getCenter().y);
+	}
+	if (camera.getCenter().y - camera.getSize().y / 2 < 0)
+	{
+		camera.setCenter(camera.getCenter().x, camera.getSize().y / 2);
+	}
+	else if (camera.getCenter().y + camera.getSize().y / 2 > height*tileHeight)
+	{
+		camera.setCenter(camera.getCenter().x,height*tileHeight - camera.getSize().y / 2);
+	}
+}
+
 vector<Vector2f>* Level::GetEnemyVector()
 {
 	return &EnemyCoordinats;

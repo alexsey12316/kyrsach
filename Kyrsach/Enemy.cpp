@@ -192,7 +192,7 @@ void Enemy::behavior(double time)
 
 				}
 			}
-			if (position.y < y&&body->GetLinearVelocity().x < 0.1)
+			if (position.y < y&&body->GetLinearVelocity().x < 0.1||(body->GetLinearVelocity().x==0&&!(direction==Direction::Stay_Left|| direction == Direction::Stay_Right)))
 			{
 				if (position.x > x)
 				{
@@ -333,12 +333,12 @@ EnemyKnight_2::EnemyKnight_2(b2World *world, double x, double y) :Enemy(x, y)
 	animation.setPosition(x - 40, y - 20);
 
 	Speed = 4;
-	powerJump = 5;
+	powerJump = 6;
 	JumpTime = currentJumpTime = 0.7;
 	health = MaxHealth = 100;
 	AttackTimer = currentAttackTimer = 4;
 	Damage = 40;
-	currentMovementTimer = MovementTimer = 3;
+	currentMovementTimer = MovementTimer = 2;
 }
 
 EnemyKnight_2::~EnemyKnight_2()
@@ -367,6 +367,7 @@ void EnemyKnight_2::Update(double time)
 	else if (isHurt)
 	{
 
+		this->body->SetLinearVelocity(b2Vec2(0,body->GetLinearVelocity().y));
 		if (direction == Direction::Left || direction == Direction::Jump_Left || direction == Direction::Stay_Left)
 		{
 			isHurt = !animation.setAnimation(9, Animation::AnimationType::once);
