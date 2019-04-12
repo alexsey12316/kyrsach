@@ -177,7 +177,7 @@ void Enemy::behavior(double time)
 
 		break;
 	case Enemy::Agressive:
-		if (isAlive && !isHurt && !isAttack)
+		if (isAlive && !isHurt && !isAttack&&!target->isDead())
 		{
 			sf::Vector2f position = target->getPosition();
 			if (OnGround)

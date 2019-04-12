@@ -4,6 +4,6 @@
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(1280, 720), "kyrsach",sf::Style::Fullscreen);
-	Game(window);
+	GameEngine game;
+	game.mainLoop();
 }

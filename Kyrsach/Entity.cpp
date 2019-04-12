@@ -134,5 +134,15 @@ void Entity::SetDamage(double damage)
 	health -= damage - damage * armor / 100;
 }
 
+int Entity::getHealth()
+{
+	return this->health;
+}
+
+int Entity::getMaxHealth()
+{
+	return this->MaxHealth;
+}
+
 
 

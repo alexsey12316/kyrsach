@@ -19,6 +19,9 @@ public:
 	void Draw(sf::RenderWindow &window)override;
 	sf::Vector2f getPosition();
 	bool isOnGround();
+	int getMana();
+	int getMaxMana();
+	bool isDead();
 
 private:
 	bool isCasting;

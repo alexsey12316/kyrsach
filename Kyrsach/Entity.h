@@ -23,6 +23,8 @@ public:
 	virtual void setMaxHealth(double MaxHealth);
 	virtual void SetDamage(Magic *magic);
 	virtual void SetDamage(double damage);
+	virtual int getHealth();
+	virtual int getMaxHealth();
 
 protected:
 	double x, y;

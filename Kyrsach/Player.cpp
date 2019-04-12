@@ -417,6 +417,21 @@ bool Player::isOnGround()
 	return OnGround;
 }
 
+int Player::getMana()
+{
+	return this->mana;
+}
+
+int Player::getMaxMana()
+{
+	return this->MaxMana;
+}
+
+bool Player::isDead()
+{
+	return !isAlive;
+}
+
 void Player::Draw(sf::RenderWindow & window)
 {
 #ifdef RECT

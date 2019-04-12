@@ -134,6 +134,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="InterFace.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Magic.cpp" />
     <ClCompile Include="Menu.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="InterFace.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Magic.h" />
     <ClInclude Include="Menu.h" />
